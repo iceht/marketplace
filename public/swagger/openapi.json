@@ -1,0 +1,288 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Simple Order API",
+        "description": "This is a simple API made for demonstration purpose",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://marketplace.test/api",
+            "description": "localhost"
+        },
+        {
+            "url": "https://virtserver.swaggerhub.com/JEGHTAMAS/marketplace/1.0.0",
+            "description": "SwaggerHub API Auto Mocking"
+        }
+    ],
+
+    "paths": {
+        "/orders/search": {
+            "post": {
+                "summary": "searches orders",
+                "description": "By passing in the appropriate options, you can search for\navailable orders in the system\n",
+                "operationId": "searchInventory",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrderSearchRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "search results matching criteria",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/OrderResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "invalid parameters"
+                    }
+                }
+            }
+        },
+        "/orders/create": {
+            "post": {
+                "summary": "make a new order",
+                "description": "Adds an new order to the system",
+                "operationId": "create",
+                "requestBody": {
+                    "description": "Order to add",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrderCreationalRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "order created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderIdResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "invalid input, object invalid"
+                    },
+                    "422": {
+                        "description": "invalid parameters"
+                    }
+                }
+            }
+        },
+        "/orders/update": {
+            "post": {
+                "summary": "update the status of the order",
+                "description": "Update the status of an order\n",
+                "operationId": "updateStatus",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrderStatusUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "status updated"
+                    },
+                    "422": {
+                        "description": "invalid parameters"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "OrderSearchRequest": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Id of an order. Search for full match"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/OrderStatus"
+                    },
+                    "from": {
+                        "type": "string",
+                        "description": "Minimum date of creation of the order. If not presented, the oldest date-time will be used.",
+                        "format": "date-time"
+                    },
+                    "to": {
+                        "type": "string",
+                        "description": "Upper limit of creation time of the order. If not presented, actual date-time will be used.",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "OrderCreationalRequest": {
+                "required": [
+                    "billingAddress",
+                    "customerEmail",
+                    "customerName",
+                    "products",
+                    "shippingAddress",
+                    "shippingMethod"
+                ],
+                "type": "object",
+                "properties": {
+                    "customerName": {
+                        "type": "string",
+                        "example": "Példa Márton"
+                    },
+                    "customerEmail": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "name@domain.tld"
+                    },
+                    "shippingMethod": {
+                        "$ref": "#/components/schemas/ShippingMethod"
+                    },
+                    "shippingAddress": {
+                        "$ref": "#/components/schemas/Address"
+                    },
+                    "billingAddress": {
+                        "$ref": "#/components/schemas/Address"
+                    },
+                    "products": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Product"
+                        }
+                    }
+                }
+            },
+            "OrderStatusUpdateRequest": {
+                "required": [
+                    "id",
+                    "status"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/OrderStatus"
+                    }
+                }
+            },
+            "OrderIdResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "minimum": 1,
+                        "type": "integer"
+                    }
+                }
+            },
+            "OrderResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "minimum": 1,
+                        "type": "integer"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/OrderStatus"
+                    },
+                    "customerName": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "sum": {
+                        "minimum": 1,
+                        "type": "number",
+                        "format": "float"
+                    }
+                }
+            },
+            "OrderStatus": {
+                "type": "string",
+                "enum": [
+                    "new",
+                    "completed"
+                ]
+            },
+            "ShippingMethod": {
+                "type": "string",
+                "enum": [
+                    "delivery",
+                    "inShop"
+                ]
+            },
+            "Address": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "postcode": {
+                        "type": "integer",
+                        "example": 1222
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Budapest"
+                    },
+                    "street": {
+                        "type": "string",
+                        "example": "Pelda utca 27/A 1/12"
+                    }
+                }
+            },
+            "Product": {
+                "required": [
+                    "name",
+                    "quantity",
+                    "unitPrice"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Test product"
+                    },
+                    "quantity": {
+                        "minimum": 1,
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "unitPrice": {
+                        "minimum": 0,
+                        "type": "number",
+                        "format": "float",
+                        "example": 123.45
+                    }
+                }
+            }
+        }
+    }
+}
