@@ -29,7 +29,7 @@ This command will populate the database with some random data.
 
 Now run a local webserver with
 ```
-php artisan:serve
+php artisan serve
 ```
 
 command. Now you should access the swagger documentation via http://127.0.0.1:8000/api/docs

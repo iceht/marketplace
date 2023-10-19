@@ -11,8 +11,12 @@
     },
     "servers": [
         {
+            "url": "http://127.0.0.1:8000/api",
+            "description": "Artisan serve"
+        },
+        {
             "url": "http://marketplace.test/api",
-            "description": "localhost"
+            "description": "Laragon localhost"
         },
         {
             "url": "https://virtserver.swaggerhub.com/JEGHTAMAS/marketplace/1.0.0",
